@@ -14,7 +14,14 @@ var (
 )
 
 func Connect() {
-	db_uri := fmt.Sprintf("%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", CONFIG["DB_USER"], CONFIG["DB_HOST"], CONFIG["DB_PORT"], CONFIG["DB_NAME"])
+	var db_uri string
+
+	if CONFIG["DB_PASS"] == "" {
+		db_uri = fmt.Sprintf("%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", CONFIG["DB_USER"], CONFIG["DB_HOST"], CONFIG["DB_PORT"], CONFIG["DB_NAME"])
+	} else {
+		db_uri = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", CONFIG["DB_USER"], CONFIG["DB_PASS"], CONFIG["DB_HOST"], CONFIG["DB_PORT"], CONFIG["DB_NAME"])
+	}
+
 	db, err = gorm.Open(mysql.Open(db_uri), &gorm.Config{})
 
 	if err != nil {
