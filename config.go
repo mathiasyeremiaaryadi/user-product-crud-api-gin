@@ -17,7 +17,7 @@ var config_env = map[string]map[string]string{
 	},
 	"production": {
 		"API_URL": "167.172.73.163:9090",
-		"DB_HOST": "167.172.73.163",
+		"DB_HOST": "localhost",
 		"DB_PORT": "3306",
 		"DB_USER": "mathias2",
 		"DB_PASS": "DmPUpSN8E394zRTi",
