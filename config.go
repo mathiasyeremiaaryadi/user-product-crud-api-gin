@@ -19,8 +19,8 @@ var config_env = map[string]map[string]string{
 		"API_URL": "167.172.73.163:9090",
 		"DB_HOST": "167.172.73.163",
 		"DB_PORT": "3306",
-		"DB_USER": "mathias",
-		"DB_PASS": "DdM7O8I1x9tywpzP",
+		"DB_USER": "mathias2",
+		"DB_PASS": "DmPUpSN8E394zRTi",
 		"DB_NAME": "mathias2",
 	},
 }
