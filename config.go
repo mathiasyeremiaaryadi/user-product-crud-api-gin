@@ -4,11 +4,11 @@ import (
 	"os"
 )
 
-const ENVIRONMENT string = "development"
+const ENVIRONMENT string = "production"
 
 var config_env = map[string]map[string]string{
 	"development": {
-		"API_URL": "http://localhost:8080",
+		"API_URL": "localhost:8080",
 		"DB_HOST": "127.0.0.1",
 		"DB_PORT": "3306",
 		"DB_USER": "root",
@@ -16,12 +16,12 @@ var config_env = map[string]map[string]string{
 		"DB_NAME": "db_user_product",
 	},
 	"production": {
-		"API_URL": "",
-		"DB_HOST": "",
-		"DB_PORT": "",
-		"DB_USER": "",
-		"DB_PASS": "",
-		"DB_NAME": "",
+		"API_URL": "167.172.73.163:9090",
+		"DB_HOST": "167.172.73.163",
+		"DB_PORT": "3306",
+		"DB_USER": "mathias",
+		"DB_PASS": "DdM7O8I1x9tywpzP",
+		"DB_NAME": "db_user_product",
 	},
 }
 

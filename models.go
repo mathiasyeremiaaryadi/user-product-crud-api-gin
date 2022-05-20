@@ -30,6 +30,7 @@ func (user *User) BeforeUpdate(tx *gorm.DB) (err error) {
 type Product struct {
 	ID          uint   `json:"id"`
 	Name        string `json:"name"`
+	Category    string `json:"category"`
 	Description string `json:"description"`
-	Status      *bool  `json:"status"`
+	Price       int    `json:"price"`
 }

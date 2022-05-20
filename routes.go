@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,7 +22,8 @@ func CORS() gin.HandlerFunc {
 }
 
 func APIRoute() {
-	router := gin.New()
+	router := gin.Default()
+	server_url := fmt.Sprint(CONFIG["API_URL"])
 
 	router.Use(CORS())
 
@@ -36,5 +39,5 @@ func APIRoute() {
 	router.PUT("/products/:id", UpdateProduct)
 	router.DELETE("/products/:id", DeleteProduct)
 
-	router.Run("localhost:9000")
+	router.Run(server_url)
 }
