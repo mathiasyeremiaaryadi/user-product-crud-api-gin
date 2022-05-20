@@ -21,7 +21,7 @@ var config_env = map[string]map[string]string{
 		"DB_PORT": "3306",
 		"DB_USER": "mathias",
 		"DB_PASS": "DdM7O8I1x9tywpzP",
-		"DB_NAME": "db_user_product",
+		"DB_NAME": "mathias2",
 	},
 }
 
