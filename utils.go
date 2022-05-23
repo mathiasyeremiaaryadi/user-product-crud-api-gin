@@ -3,8 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -12,13 +14,14 @@ var jwtKey = []byte(CONFIG["TOKEN_KEY"])
 
 func generateJwtToken(userModel User) (string, error) {
 	expiresAt := time.Now().Local().Add(24 * time.Hour).Unix()
-	jwtClaims := JWTClaims{
-		StandardClaims: jwt.StandardClaims{
-			Subject:   userModel.Username,
-			ExpiresAt: expiresAt,
-		},
-		user: userModel,
+	jwtClaims := jwt.MapClaims{}
+	jwtClaims["user"] = map[string]interface{}{
+		"id":       userModel.ID,
+		"username": userModel.Username,
+		"email":    userModel.Email,
+		"role":     userModel.Role,
 	}
+	jwtClaims["expiresAt"] = expiresAt
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
 
@@ -31,10 +34,8 @@ func generateJwtToken(userModel User) (string, error) {
 }
 
 func validateJwtToken(jwtTokenString string) (interface{}, error) {
-	var jwtClaims JWTClaims
-	jwtToken, err := jwt.ParseWithClaims(
+	jwtToken, err := jwt.Parse(
 		jwtTokenString,
-		&jwtClaims,
 		func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("failed to validate and sign the token")
@@ -52,5 +53,20 @@ func validateJwtToken(jwtTokenString string) (interface{}, error) {
 		return nil, errors.New("invalid token")
 	}
 
-	return jwtClaims.user, nil
+	return jwtToken, nil
+}
+
+func getJwtToken(c *gin.Context) (string, bool) {
+	requestHeader := c.GetHeader("Authorization")
+	requestHeaderArr := strings.Split(requestHeader, " ")
+	if len(requestHeaderArr) != 2 {
+		return "", false
+	}
+
+	authRequestType := strings.Trim(requestHeaderArr[0], "\n\r\t")
+	if strings.ToLower(authRequestType) != strings.ToLower("Bearer") {
+		return "", false
+	}
+
+	return strings.Trim(requestHeaderArr[1], "\n\t\r"), true
 }

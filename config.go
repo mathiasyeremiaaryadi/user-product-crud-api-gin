@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-const ENVIRONMENT string = "production"
+const ENVIRONMENT string = "development"
 
 var config_env = map[string]map[string]string{
 	"development": {
