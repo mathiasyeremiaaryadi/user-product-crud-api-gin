@@ -14,15 +14,15 @@ var (
 )
 
 func Connect() {
-	var db_uri string
+	var dbUri string
 
 	if CONFIG["DB_PASS"] == "" {
-		db_uri = fmt.Sprintf("%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", CONFIG["DB_USER"], CONFIG["DB_HOST"], CONFIG["DB_PORT"], CONFIG["DB_NAME"])
+		dbUri = fmt.Sprintf("%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", CONFIG["DB_USER"], CONFIG["DB_HOST"], CONFIG["DB_PORT"], CONFIG["DB_NAME"])
 	} else {
-		db_uri = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", CONFIG["DB_USER"], CONFIG["DB_PASS"], CONFIG["DB_HOST"], CONFIG["DB_PORT"], CONFIG["DB_NAME"])
+		dbUri = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", CONFIG["DB_USER"], CONFIG["DB_PASS"], CONFIG["DB_HOST"], CONFIG["DB_PORT"], CONFIG["DB_NAME"])
 	}
 
-	db, err = gorm.Open(mysql.Open(db_uri), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(dbUri), &gorm.Config{})
 
 	if err != nil {
 		log.Println("Database not connected : ", err)

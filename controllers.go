@@ -5,16 +5,69 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
+
+// Authentication controllers
+func Login(c *gin.Context) {
+	var userModel User
+
+	if err := c.ShouldBindJSON(&userModel); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    400,
+			"data":    nil,
+			"message": "Failed to convert JSON",
+		})
+		return
+	}
+
+	inputEmail := userModel.Email
+	inputPassword := []byte(userModel.Password)
+
+	if err := db.Where("email=?", inputEmail).Find(&userModel); err.Error != nil || userModel.ID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    401,
+			"data":    nil,
+			"message": "Invalid email",
+		})
+		return
+	}
+
+	dbUserPassword := []byte(userModel.Password)
+	if err := bcrypt.CompareHashAndPassword(dbUserPassword, inputPassword); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    401,
+			"data":    nil,
+			"message": "Invalid password",
+		})
+		return
+	}
+
+	jwtToken, err := generateJwtToken(userModel)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    401,
+			"data":    nil,
+			"message": "Failed to generate token",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"data":    jwtToken,
+		"message": "Login successfully",
+	})
+}
 
 // User controllers
 func GetUsers(c *gin.Context) {
-	user_model := []User{}
+	userModel := []User{}
 
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
 
-	if err := db.Limit(limit).Offset(offset).Find(&user_model); err.Error != nil {
+	if err := db.Limit(limit).Offset(offset).Find(&userModel); err.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    500,
 			"data":    nil,
@@ -25,16 +78,16 @@ func GetUsers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
-		"data":    user_model,
+		"data":    userModel,
 		"message": "All users retrieved successfully",
 	})
 }
 
 func GetUser(c *gin.Context) {
-	user_model := User{}
-	user_id := c.Param("id")
+	userModel := User{}
+	userId := c.Param("id")
 
-	if err := db.First(&user_model, user_id); err.Error != nil {
+	if err := db.First(&userModel, userId); err.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code":    404,
 			"data":    nil,
@@ -45,14 +98,14 @@ func GetUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
-		"data":    user_model,
+		"data":    userModel,
 		"message": "A user retrieved sucessfully",
 	})
 }
 
 func CreateUser(c *gin.Context) {
-	var user_model User
-	if err := c.ShouldBindJSON(&user_model); err != nil {
+	var userModel User
+	if err := c.ShouldBindJSON(&userModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    400,
 			"data":    nil,
@@ -61,7 +114,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	if err := db.Create(&user_model); err.Error != nil {
+	if err := db.Create(&userModel); err.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    500,
 			"data":    nil,
@@ -78,10 +131,10 @@ func CreateUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
-	var user_model User
-	user_id := c.Param("id")
+	var userModel User
+	userId := c.Param("id")
 
-	if err := c.ShouldBindJSON(&user_model); err != nil {
+	if err := c.ShouldBindJSON(&userModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    400,
 			"data":    nil,
@@ -90,7 +143,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	if err := db.Model(&user_model).Where("id=?", user_id).Updates(&user_model); err.Error != nil {
+	if err := db.Model(&userModel).Where("id=?", userId).Updates(&userModel); err.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code":    404,
 			"data":    nil,
@@ -107,10 +160,10 @@ func UpdateUser(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	var user_model User
-	user_id := c.Param("id")
+	var userModel User
+	userId := c.Param("id")
 
-	if err := db.Delete(&user_model, user_id); err.Error != nil {
+	if err := db.Delete(&userModel, userId); err.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code":    404,
 			"data":    nil,
@@ -128,12 +181,12 @@ func DeleteUser(c *gin.Context) {
 
 // Product controllers
 func GetProducts(c *gin.Context) {
-	product_model := []Product{}
+	productModel := []Product{}
 
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
 
-	if err := db.Limit(limit).Offset(offset).Find(&product_model); err.Error != nil {
+	if err := db.Limit(limit).Offset(offset).Find(&productModel); err.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    500,
 			"data":    nil,
@@ -144,16 +197,16 @@ func GetProducts(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
-		"data":    product_model,
+		"data":    productModel,
 		"message": "All products retrieved successfully",
 	})
 }
 
 func GetProduct(c *gin.Context) {
-	product_model := Product{}
-	product_id := c.Param("id")
+	productModel := Product{}
+	productId := c.Param("id")
 
-	if err := db.First(&product_model, product_id); err.Error != nil {
+	if err := db.First(&productModel, productId); err.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code":    404,
 			"data":    nil,
@@ -164,14 +217,14 @@ func GetProduct(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"code":    200,
-		"data":    product_model,
+		"data":    productModel,
 		"message": "A product retrieved sucessfully",
 	})
 }
 
 func CreateProduct(c *gin.Context) {
-	var product_model Product
-	if err := c.ShouldBindJSON(&product_model); err != nil {
+	var productModel Product
+	if err := c.ShouldBindJSON(&productModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    400,
 			"data":    nil,
@@ -180,7 +233,7 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
-	if err := db.Create(&product_model); err.Error != nil {
+	if err := db.Create(&productModel); err.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    500,
 			"data":    nil,
@@ -197,10 +250,10 @@ func CreateProduct(c *gin.Context) {
 }
 
 func UpdateProduct(c *gin.Context) {
-	var product_model Product
-	product_id := c.Param("id")
+	var productModel Product
+	productId := c.Param("id")
 
-	if err := c.ShouldBindJSON(&product_model); err != nil {
+	if err := c.ShouldBindJSON(&productModel); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    400,
 			"data":    nil,
@@ -209,7 +262,7 @@ func UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	if err := db.Model(&product_model).Where("id=?", product_id).Updates(&product_model); err.Error != nil {
+	if err := db.Model(&productModel).Where("id=?", productId).Updates(&productModel); err.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code":    404,
 			"data":    nil,
@@ -226,10 +279,10 @@ func UpdateProduct(c *gin.Context) {
 }
 
 func DeleteProduct(c *gin.Context) {
-	var product_model Product
-	product_id := c.Param("id")
+	var productModel Product
+	productId := c.Param("id")
 
-	if err := db.Delete(&product_model, product_id); err.Error != nil {
+	if err := db.Delete(&productModel, productId); err.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code":    404,
 			"data":    nil,

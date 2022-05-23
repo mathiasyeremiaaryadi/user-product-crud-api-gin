@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -16,14 +17,14 @@ type User struct {
 }
 
 func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
-	hashed_password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	user.Password = string(hashed_password)
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	user.Password = string(hashedPassword)
 	return
 }
 
 func (user *User) BeforeUpdate(tx *gorm.DB) (err error) {
-	hashed_password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	user.Password = string(hashed_password)
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	user.Password = string(hashedPassword)
 	return
 }
 
@@ -33,4 +34,9 @@ type Product struct {
 	Category    string `json:"category"`
 	Description string `json:"description"`
 	Price       int    `json:"price"`
+}
+
+type JWTClaims struct {
+	jwt.StandardClaims
+	user User `json:"user"`
 }
