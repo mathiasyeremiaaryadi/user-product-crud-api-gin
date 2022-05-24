@@ -30,6 +30,18 @@ func Connect() {
 		log.Println("Database connected")
 	}
 
+	db.Migrator().DropTable(&User{})
+	db.Migrator().DropTable(&Product{})
+
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Product{})
+
+	db.Create(&User{
+		Username: "Admin",
+		Email:    "admin@gmail.com",
+		Phone:    "089991234",
+		Role:     "admin",
+		Status:   false,
+		Password: "secret123",
+	})
 }
