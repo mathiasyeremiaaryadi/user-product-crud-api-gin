@@ -19,7 +19,7 @@ var config_env = map[string]map[string]string{
 	"production": {
 		"API_URL":   "167.172.73.163:9090",
 		"TOKEN_KEY": ".[P}d!T%%Ju2cVCVC;,LJji]e&fZAJq}SB:?:Qn9vdK=2*/?zzJd7htbb#*6aP?==a/K4-*VVy4Heqh@37zG)C86$Eu}a/%;w9,K=wWz))?F?8:c*PN]hEcPa5r37d8yfBX5{X[#_QvgYZ-gTe4kuQ6!C,JMZ7_Z)%nrFZ!CNb7SA?,Zk]ra6n#Zpf!_/FSpqH*GxE$U",
-		"DB_HOST":   "167.172.73.163",
+		"DB_HOST":   "localhost",
 		"DB_PORT":   "3306",
 		"DB_USER":   "mathias2",
 		"DB_PASS":   "DmPUpSN8E394zRTi",
